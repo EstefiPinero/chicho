@@ -1,14 +1,13 @@
-
 var personas = [];
-let hasFilter = false;
-let arrayNombre = [];
-
+// var input_search = 
+var arrayNombre = [];
+var hasFilter = false;
 //--------------------------------------------------------------------------------------------
 
 function queTiempo (tiempo, fn) {
     setTimeout (() => {
         fn();
-    }, queTiempo());
+    }, tiempo);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -24,9 +23,9 @@ function handleOnAlternarLista() {
         }else {
             recargarLista(arrayNombre);
             hasFilter = true;
-    }
-    alert('se actulizo');
-})
+        }
+        alert('se actulizo');
+    })
 }
 //--------------------------------------------------------------------------------------------
 /**
@@ -51,13 +50,15 @@ function handleOnCantidadPersonas() {
  */
 //Hacer funcionalidad para eliminar la primera persona de la lista.
 function handleOnEliminarPrimero() {
+    console.log(hasFilter);
 
     if(hasFilter) {
-        arrayNombre.unshift
+        arrayNombre.shift();
+        recargarLista(arrayNombre)
+                      
+    } else { 
+        personas.shift();
         recargarLista(personas);
-        hasFilter = true;        
-    } else { personas.unshift
-        recargarLista(personas)
     }
 }
 
@@ -70,11 +71,12 @@ function handleOnEliminarPrimero() {
  */
 function handleOnEliminarUltimo() {
     if(hasFilter) {
-    arrayNombre.pop
-    recargarLista(personas);
-    hasFilter = true;        
-    } else { personas.pop
-    recargarLista(personas)
+    arrayNombre.pop();
+    recargarLista(arrayNombre)
+           
+    } else { 
+        personas.pop();
+        recargarLista(personas);
     }
 }
 //     alert("Hacer funcionalidad para eliminar la ultima persona de la lista.");
@@ -86,20 +88,35 @@ function handleOnEliminarUltimo() {
  * @param {string} nombre 
  */
 function handleOnBuscarPorNombre() {
+       
+    hasFilter = true;
+    let nombreSearch = document.getElementById('busquedaNombre').value;
+    localStorage.setItem('nombreFiltrado', nombre);
+    
+    arrayNombre = personas.filter(function(elem){
+        return elem.nombre.toLowerCase().includes(nombreSearch.toLowerCase().trim())
+    });
 
-        let nombre = document.getElementById('busquedaNombre').value;    
-
-    for ( let i=0; i<personas.length; i++) {
-
-        if (personas[i].nombre.toLowerCase().includes(nombre.toLowerCase().trim())) {
-            arrayNombre.push(personas[i]);
-        }else{
-            alert("El nombre ingresado no se encuentra en la lista");
-        }
+    if(arrayNombre.length > 0){
+        recargarLista(arrayNombre);
     }
-hasFilter = true;
-recargarLista(arrayNombre);
+    else{
+        alert("El nombre ingresado no se encuentra en la lista");
+    }
+    
 }
+    //  recargarLista(arrayNombre);
+    // for ( let i=0; i<personas.length; i++) {
+
+    //     if (personas[i].nombre.toLowerCase().includes(nombre.toLowerCase().trim())) {
+    //         arrayNombre.push(personas[i]);
+    //     }else{
+    //         alert("El nombre ingresado no se encuentra en la lista");
+    //     }
+    // }
+    
+
+
     // alert("Hacer funcionalidad para filtrar las personas que no coincidan con el criterio de busqueda.");
 
 //--------------------------------------------------------------------------------------------
@@ -108,13 +125,12 @@ recargarLista(arrayNombre);
  */
 function handleOnLimpiarBusquedaPersona() {
 
-    let busquedaNombre = document.getElementById('busquedaNombre');
-    recargarLista(personas);
-    busquedaNombre.value = '';
+    nombreSearch = '';
     hasFilter = false;
-   
-    // alert("Hacer funcionalidad para limpiar el criterio de busqueda y recargar la lista completa.");
+    return onCargarPersonas();       
+      
 }
+// alert("Hacer funcionalidad para limpiar el criterio de busqueda y recargar la lista completa.");
 
 //--------------------------------------------------------------------------------------------
 /*** indica que persona hay que eliminar  * pasando por parametro el id.
@@ -122,12 +138,23 @@ function handleOnLimpiarBusquedaPersona() {
  */
 function handleOnEliminarPersona(id) {
 
-
-
-    
-    alert(`hacer la funcionalidad necesaria para eliminar la persona con id ${id}`);
+    let validar = confirm ('Estas seguro que deseas borrar el id - ' + id);
+    if (validar && !hasFilter) {
+        let index = personas.findIndex(elem => elem.id == id);
+        personas.splice(index,1);
+        recargarLista(personas)
+    }
+    else {
+        let index = arrayNombre.findIndex(elem => elem.id == id);
+        arrayNombre.splice(index,1);
+        recargarLista(arrayNombre)
+    }
     
 }
+    
+//     alert(`hacer la funcionalidad necesaria para eliminar la persona con id ${id}`);
+    
+// }
 
 //--------------------------------------------------------------------------------------------
 /** * evento para actualizar el nombre de una persona * pasando por parametro el id.
@@ -248,8 +275,15 @@ function onCargarPersonas() {
 
     personas = [persona1, persona2, persona3, persona4, persona5, persona6];
 
-    // recargarLista(personas, function(){console.log('hola')});
+    recargarLista(personas);
     
+
+    
+    let nombreLocalStorage = localStorage.getItem ('nombreFiltrado');
+
+    if(nombreLocalStorage){
+    document.getElementById('busquedaNombre').value = nombreLocalStorage;
+    }
 }
 
 onCargarPersonas();
